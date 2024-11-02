@@ -23,7 +23,7 @@ function Motor:new(id,max,min)
     end
 
     --create a new pid controller specific to the electric motor instance
-    local PIDController = require("PIDController")
+    local PIDController = require("lib/PIDController")
     local Controller = PIDController:newController(0.1,0.1,0.1,max,min)
 
     --create the metatable for the electric motor's properties
