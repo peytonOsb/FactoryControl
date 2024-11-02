@@ -46,22 +46,6 @@ function Motor:setSlave(...)
     assert(type(args[1]) == "table","the first input must be a motor object")
     assert(type(args[2]) == "boolean" or "nil","the second input must be a boolean declaring whether the follow is inverted")
 
-    --Initialization of slaves list
-    self.slaves = self.slaves or {}
-
-    --set status of the slave motor depending on the inverted parameter
-    if args[2] == true then
-        args[1].status = "Inv_slave"
-        self.status = "master"
-
-        --negating motor parameters for inversion
-        args[1].max_speed = -self.min_speed
-        args[1].min_speed = -self.max_speed
-    else
-        args[1].status = "slave"
-        self.status = "master"
-    end
-
     --append the motor to the list of the master's slaves
     table.insert(self.slaves, args[1])
 end --unimplemented
