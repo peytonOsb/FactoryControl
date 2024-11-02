@@ -45,7 +45,7 @@ file1.close()
 
 --file retrieval for motor controller class
 T = http.get(test)
-MCFile = T.readAll()
+TFile = T.readAll()
 
 local file1 = fs.open("test", "w")
 file1.write(TFile)

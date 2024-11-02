@@ -1,4 +1,4 @@
-local mc = require("motorCont")
+local mc = require("lib/motorCont")
 
 --motor initialization
 local master = mc:new("7",100,100)
