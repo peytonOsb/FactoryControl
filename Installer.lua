@@ -3,10 +3,11 @@ local Factory_class = "https://raw.githubusercontent.com/peytonOsb/FactoryContro
 local Module_tester = "https://raw.githubusercontent.com/peytonOsb/FactoryControl/main/ModuleTester.lua"
 local PIDController = "https://raw.githubusercontent.com/peytonOsb/FactoryControl/main/PIDController.lua"
 local MotorController = "https://raw.githubusercontent.com/peytonOsb/FactoryControl/main/motor_controller.lua"
+local test = "https://raw.githubusercontent.com/peytonOsb/FactoryControl/main/test.lua"
 
 --read variables for each of the files we have to recieve
-local FC, MT, PID, MC
-local FCFile, MTFile, PIDFile, MCFile
+local FC, MT, PID, MC, T
+local FCFile, MTFile, PIDFile, MCFile, TFile
 
 fs.makeDir("lib")
 
@@ -40,4 +41,12 @@ MCFile = MC.readAll()
 
 local file1 = fs.open("lib/motorCont", "w")
 file1.write(MCFile)
+file1.close()
+
+--file retrieval for motor controller class
+T = http.get(test)
+MCFile = T.readAll()
+
+local file1 = fs.open("test", "w")
+file1.write(TFile)
 file1.close()
