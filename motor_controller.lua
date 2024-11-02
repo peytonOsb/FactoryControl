@@ -47,7 +47,7 @@ function Motor:setSlave(...)
     assert(type(args[2]) == "boolean" or "nil","the second input must be a boolean declaring whether the follow is inverted")
 
     --append the motor to the list of the master's slaves
-    table.insert(self.slaves, args[1])
+    table.insert(self.slaves, { motor = args[1], inverted = args[2] })
 end --unimplemented
 
 --sets another motor as a slave to this motor
