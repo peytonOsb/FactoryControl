@@ -58,22 +58,19 @@ end
 --sets another motor as a slave to this motor
 function Motor:setSlave(...)  
     local args = {...}
-    --verify input perameters
-    assert(type(args[1]) == "table","the first input must be a motor object")
-    assert(type(args[2]) == "boolean" or "nil","the second input must be a boolean declaring whether the follow is inverted")
+    -- Verify input parameters
+    assert(type(args[1]) == "table", "the first input must be a motor object")
+    assert(type(args[2]) == "boolean" or args[2] == nil, "the second input must be a boolean declaring whether the follow is inverted")
 
-    --verify the master motor has a  slave list then append the slave motor to the list of the master's slaves
-    if self.slaves ~= nil then
-        table.insert(self.slaves, { motor = args[1], inverted = args[2] })
-        args[1].status = "slave"
-        self.status = "master"
-    else
-        self.slaves = {}
-        table.insert(self.slaves, { motor = args[1], inverted = args[2] })
-        args[1].status = "slave"
-        self.status = "master"
-    end
+    -- Initialize self.slaves if it's nil
+    self.slaves = self.slaves or {}
+    
+    -- Append the slave motor to the master's list of slaves
+    table.insert(self.slaves, { motor = args[1], inverted = args[2] })
+    args[1].status = "slave"
+    self.status = "master"
 end
+
 
 --slave removal function for motors
 function Motor:removeSlave(...)
