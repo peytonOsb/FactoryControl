@@ -84,21 +84,15 @@ function Motor:removeSlave(...)
     -- Loop over each motor argument to remove matching slaves
     for _, motor in ipairs(args) do
         if type(motor) == "string" then
-            -- Search for the slave by ID
-            for i = #self.slaves, 1, -1 do
-                if self.slaves[i].motor.id == motor then
-                    self.slaves[i].motor.status = nil
-                    table.remove(self.slaves, i)
-                    break
+            for index, slave_data in ipairs(self.slaves)do 
+                if slave_data[1]:getId() == "electric_motor_" .. motor then
+                    table.remove(self.slaves, index)
                 end
             end
         elseif type(motor) == "table" then
-            -- Search for the slave by object reference
-            for i = #self.slaves, 1, -1 do
-                if self.slaves[i].motor == motor then
-                    self.slaves[i].motor.status = nil
-                    table.remove(self.slaves, i)
-                    break
+            for index, slave_data in ipairs(self.slaves)do 
+                if motor:getId() == slave_data[1]:getId() then
+                    table.remove(self.slaves, index)
                 end
             end
         end
