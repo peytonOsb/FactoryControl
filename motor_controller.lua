@@ -101,6 +101,7 @@ end
 
 -- Helper function for setting the motor and all slaves' speeds
 function Motor:run(set_point)
+    local clamped_speed
     assert(type(set_point) == "number", "The speed a motor needs to be set to should be a number")
 
     -- Check if the motor whose speed is being altered is a slave
@@ -108,8 +109,14 @@ function Motor:run(set_point)
         error("This motor is a slave and should be set through the master motor")
     end
 
-    -- parameter clamping
-    local clamped_speed = math.max(math.min(set_point, self.max_speed), self.min_speed)
+    --parameter clamping for speed setting
+    if set_point < self.min_speed then
+        clamped_speed = self.min_speed
+    elseif set_point > self.max_speed then
+       clamped_speed = self.max_speed 
+    else
+        clamped_speed = set_point
+    end
 
     -- Set the motor's speed as well as all its slaves' speeds, if any
     if self:getStatus() == "master" then
