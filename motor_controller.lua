@@ -42,12 +42,19 @@ function Motor:new(...)
         local Controller = PIDController:newController(0.1,0.1,0.1,args[2],args[3])
     end
 
+    --min max sorting allowing input of min and max in any order
+    if args[3] > args[2] then
+        local max = args[3]
+        args[3] = args[2]
+        args[2] = max
+    end
+        
     --create the metatable for the electric motor's properties
     local self_obj = setmetatable({}, Motor)
     self_obj.motor = motor
     self_obj.id = peripheral_name
-    self_obj.min_speed = args[2]
-    self_obj.max_speed = args[3]
+    self_obj.max_speed = args[2]
+    self_obj.min_speed = args[3]
     self_obj.controller = Controller
     self_obj.status = nil
 
@@ -101,6 +108,7 @@ end
 
 -- Helper function for setting the motor and all slaves' speeds
 function Motor:run(set_point)
+    local clamped_speed
     assert(type(set_point) == "number", "The speed a motor needs to be set to should be a number")
 
     -- Check if the motor whose speed is being altered is a slave
@@ -108,18 +116,28 @@ function Motor:run(set_point)
         error("This motor is a slave and should be set through the master motor")
     end
 
+    --parameter clamping for speed setting
+    if set_point < self.min_speed then
+        clamped_speed = self.min_speed
+    elseif set_point > self.max_speed then
+       clamped_speed = self.max_speed 
+    else
+        clamped_speed = set_point
+    end
+
     -- Set the motor's speed as well as all its slaves' speeds, if any
     if self:getStatus() == "master" then
-        self.motor.setSpeed(set_point)
+        --set speed of both the "master" motor and slav motors' speeds
+        self.motor.setSpeed(clamped_speed)
         for index, slave_data in ipairs(self.slaves) do
             if slave_data[2] == true then
-                slave_data[1].motor.setSpeed(-set_point)
+                slave_data[1].motor.setSpeed(-clamped_speed)
             else
-                slave_data[1].motor.setSpeed(set_point)
+                slave_data[1].motor.setSpeed(clamped_speed)
             end
         end        
     elseif self:getStatus() == nil then
-        self.motor.setSpeed(set_point)
+        self.motor.setSpeed(clamped_speed)
     end
 end
 
