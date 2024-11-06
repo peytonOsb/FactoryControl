@@ -1,9 +1,9 @@
 -- git hub file location setting
-local Factory_class = "https://raw.githubusercontent.com/peytonOsb/FactoryControl/max/min-implementation/Factory_classes.lua"
-local Module_tester = "https://raw.githubusercontent.com/peytonOsb/FactoryControl/max/min-implementation/ModuleTester.lua"
-local PIDController = "https://raw.githubusercontent.com/peytonOsb/FactoryControl/max/min-implementation/PIDController.lua"
-local MotorController = "https://raw.githubusercontent.com/peytonOsb/FactoryControl/max/min-implementation/motor_controller.lua"
-local test = "https://raw.githubusercontent.com/peytonOsb/FactoryControl/max/min-implementation/test.lua"
+local Factory_class = "https://raw.githubusercontent.com/peytonOsb/FactoryControl/refs/heads/max/min-implementation/Factory_classes.lua"
+local Module_tester = "https://raw.githubusercontent.com/peytonOsb/FactoryControl/refs/heads/max/min-implementation/ModuleTester.lua"
+local PIDController = "https://raw.githubusercontent.com/peytonOsb/FactoryControl/refs/heads/max/min-implementation/PIDController.lua"
+local MotorController = "https://raw.githubusercontent.com/peytonOsb/FactoryControl/refs/heads/max/min-implementation/motor_controller.lua"
+local test = "https://raw.githubusercontent.com/peytonOsb/FactoryControl/refs/heads/max/min-implementation/test.lua"
 local installer = "https://https://raw.githubusercontent.com/peytonOsb/FactoryControl/refs/heads/max/min-implementation/Installer.lua"
 
 --read variables for each of the files we have to recieve
@@ -14,6 +14,7 @@ fs.makeDir("lib")
 
 --file retrieval for the installer
 IN = http.get(installer)
+print(IN)
 INFile = IN.readAll()
 
 local file1 = fs.open("installer", "w")
