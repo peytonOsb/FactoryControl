@@ -146,12 +146,12 @@ end
 
 --helper function for retrieving the status of the current motor
 function Motor:getStatus()
-    return self.motor.status
+    return self.status
 end
 
 -- helper function for retrieving the id of the current motor
 function Motor:getId()
-    return self.motor.id
+    return self.id
 end
 
 --helper function for stopping the motor
