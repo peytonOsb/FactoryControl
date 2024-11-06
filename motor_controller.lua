@@ -42,6 +42,13 @@ function Motor:new(...)
         local Controller = PIDController:newController(0.1,0.1,0.1,args[2],args[3])
     end
 
+    --min max sorting allowing input of min and max in any order
+    if args[3] < args[2] then
+        local min = args[3]
+        args[3] = args[2]
+        args[2] = min
+    end
+        
     --create the metatable for the electric motor's properties
     local self_obj = setmetatable({}, Motor)
     self_obj.motor = motor
