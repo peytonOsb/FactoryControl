@@ -43,18 +43,18 @@ function Motor:new(...)
     end
 
     --min max sorting allowing input of min and max in any order
-    if args[3] < args[2] then
-        local min = args[3]
+    if args[3] > args[2] then
+        local max = args[3]
         args[3] = args[2]
-        args[2] = min
+        args[2] = max
     end
         
     --create the metatable for the electric motor's properties
     local self_obj = setmetatable({}, Motor)
     self_obj.motor = motor
     self_obj.id = peripheral_name
-    self_obj.min_speed = args[3]
     self_obj.max_speed = args[2]
+    self_obj.min_speed = args[3]
     self_obj.controller = Controller
     self_obj.status = nil
 
