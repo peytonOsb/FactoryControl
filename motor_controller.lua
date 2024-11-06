@@ -108,20 +108,21 @@ function Motor:run(set_point)
         error("This motor is a slave and should be set through the master motor")
     end
 
+    -- parameter clamping
+    local clamped_speed = math.max(math.min(set_point, self.max_speed), self.min_speed)
+
     -- Set the motor's speed as well as all its slaves' speeds, if any
     if self:getStatus() == "master" then
+        --set speed of both the "master" motor and slav motors' speeds
         self.motor.setSpeed(set_point)
         for index, slave_data in ipairs(self.slaves) do
             if slave_data[2] == true then
-                local clamped_speed = math.min(math.max(set_point, self.max), self.min)
                 slave_data[1].motor.setSpeed(-clamped_speed)
             else
-                local clamped_speed = math.min(math.max(set_point, self.max), self.min)
                 slave_data[1].motor.setSpeed(clamped_speed)
             end
         end        
     elseif self:getStatus() == nil then
-        local clamped_speed = math.max(self.min, math.min(self.max, set_point))
         self.motor.setSpeed(clamped_speed)
     end
 end

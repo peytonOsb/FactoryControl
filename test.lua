@@ -1,23 +1,19 @@
 local mc = require("lib/motorCont")
 
---motor initialization
-local master = mc:new("7",100,100)
-local slave = mc:new("8",100,100)
-local slave2 = mc:new("9",100,100)
+--parameter declaration
+local max = 200
+local min = 100
 
+--motor initialization
+local master = mc:new("7",max,min)
+local slave = mc:new("8",max,min)
+local slave2 = mc:new("9",max,min)
+
+--follower initialization
 master:setSlave(slave,true)
 master:setSlave(slave,false)
 
+--run testing
 master:run(50)
-print(slave)
 
---[[
-master:setSlave(slave,false)
-master:setSlave(slave2,false)
 
-local slaves = master:getSlaves()
-
-for i = 1, #slaves do
-    print(master.slaves[i]:getId())
-end
-]]
