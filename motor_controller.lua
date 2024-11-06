@@ -121,7 +121,7 @@ function Motor:run(set_point)
     -- Set the motor's speed as well as all its slaves' speeds, if any
     if self:getStatus() == "master" then
         --set speed of both the "master" motor and slav motors' speeds
-        self.motor.setSpeed(set_point)
+        self.motor.setSpeed(clamped_speed)
         for index, slave_data in ipairs(self.slaves) do
             if slave_data[2] == true then
                 slave_data[1].motor.setSpeed(-clamped_speed)
