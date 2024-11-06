@@ -119,9 +119,9 @@ function Motor:run(set_point)
         self.motor.setSpeed(set_point)
         for index, slave_data in ipairs(self.slaves) do
             if slave_data[2] == true then
-                slave_data.motor.setSpeed(-set_point)
+                slave_data[1].motor.setSpeed(-set_point)
             else
-                slave_data.motor.setSpeed(set_point)
+                slave_data[1].motor.setSpeed(set_point)
             end
         end
     elseif self:getStatus() == nil then
