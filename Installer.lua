@@ -1,10 +1,10 @@
 -- git hub file location setting
-local Factory_class = "https://raw.githubusercontent.com/peytonOsb/FactoryControl/max/min-implementation/Factory_classes.lua"
-local Module_tester = "https://raw.githubusercontent.com/peytonOsb/FactoryControl/max/min-implementation/ModuleTester.lua"
-local PIDController = "https://raw.githubusercontent.com/peytonOsb/FactoryControl/max/min-implementation/PIDController.lua"
-local MotorController = "https://raw.githubusercontent.com/peytonOsb/FactoryControl/max/min-implementation/motor_controller.lua"
-local test = "https://raw.githubusercontent.com/peytonOsb/FactoryControl/max/min-implementation/test.lua"
-local installer = "https://https://raw.githubusercontent.com/peytonOsb/FactoryControl/refs/heads/max/min-implementation/Installer.lua"
+local Factory_class = "https://raw.githubusercontent.com/peytonOsb/FactoryControl/main/Factory_classes.lua"
+local Module_tester = "https://raw.githubusercontent.com/peytonOsb/FactoryControl/main/ModuleTester.lua"
+local PIDController = "https://raw.githubusercontent.com/peytonOsb/FactoryControl/main/PIDController.lua"
+local MotorController = "https://raw.githubusercontent.com/peytonOsb/FactoryControl/main/motor_controller.lua"
+local test = "https://raw.githubusercontent.com/peytonOsb/FactoryControl/main/test.lua"
+local installer = "https://https://raw.githubusercontent.com/peytonOsb/FactoryControl/refs/heads/main/Installer.lua"
 
 --read variables for each of the files we have to recieve
 local FC, MT, PID, MC, T, IN
