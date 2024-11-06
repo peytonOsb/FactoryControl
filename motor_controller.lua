@@ -113,13 +113,16 @@ function Motor:run(set_point)
         self.motor.setSpeed(set_point)
         for index, slave_data in ipairs(self.slaves) do
             if slave_data[2] == true then
-                slave_data[1].motor.setSpeed(-set_point)
+                local clamped_speed = math.max(-self.min, math.min(-self.max, set_point))
+                slave_data[1].motor.setSpeed(-clamped_speed)
             else
-                slave_data[1].motor.setSpeed(set_point)
+                local clamped_speed = math.max(self.min, math.min(self.max, set_point))
+                slave_data[1].motor.setSpeed(clamped_speed)
             end
         end        
     elseif self:getStatus() == nil then
-        self.motor.setSpeed(set_point)
+        local clamped_speed = math.max(self.min, math.min(self.max, set_point))
+        self.motor.setSpeed(clamped_speed)
     end
 end
 
