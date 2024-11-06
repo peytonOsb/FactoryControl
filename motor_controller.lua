@@ -66,7 +66,7 @@ function Motor:setSlave(...)
     self.slaves = self.slaves or {}
     
     -- Append the slave motor to the master's list of slaves
-    table.insert(self.slaves, { motor = args[1], inverted = args[2] })
+    table.insert(self.slaves, {args[1], args[2]})
     args[1].status = "slave"
     self.status = "master"
 end
@@ -118,7 +118,7 @@ function Motor:run(set_point)
     if self:getStatus() == "master" then
         self.motor.setSpeed(set_point)
         for index, slave_data in ipairs(self.slaves) do
-            if slave_data.inverted then
+            if slave_data[2] == true then
                 slave_data.motor.setSpeed(-set_point)
             else
                 slave_data.motor.setSpeed(set_point)
