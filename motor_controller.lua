@@ -66,10 +66,12 @@ function Motor:setSlave(...)
     if self.slaves ~= nil then
         table.insert(self.slaves, { motor = args[1], inverted = args[2] })
         args[1].status = "slave"
+        self.status = "master"
     else
         self.slaves = {}
         table.insert(self.slaves, { motor = args[1], inverted = args[2] })
         args[1].status = "slave"
+        self.status = "master"
     end
 end
 
