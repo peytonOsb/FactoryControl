@@ -46,8 +46,8 @@ function Motor:new(...)
     local self_obj = setmetatable({}, Motor)
     self_obj.motor = motor
     self_obj.id = peripheral_name
-    self_obj.min_speed = args[2]
-    self_obj.max_speed = args[3]
+    self_obj.min_speed = args[3]
+    self_obj.max_speed = args[2]
     self_obj.controller = Controller
     self_obj.status = nil
 

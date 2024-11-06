@@ -11,9 +11,9 @@ local slave2 = mc:new("9",max,min)
 
 --follower initialization
 master:setSlave(slave,true)
-master:setSlave(slave,false)
+master:setSlave(slave2,false)
 
 --run testing
 master:run(50)
-
+print(master:getSpeed())
 
