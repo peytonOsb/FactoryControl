@@ -100,7 +100,8 @@ function Motor:removeSlave(...)
 end
 
 -- Helper function for setting the motor and all slaves' speeds
-function Motor:run(set_point)
+function Motor:run(set_point,ramped)
+    local tolerance = 0.2
     assert(type(set_point) == "number", "The speed a motor needs to be set to should be a number")
 
     -- Check if the motor whose speed is being altered is a slave
@@ -108,18 +109,49 @@ function Motor:run(set_point)
         error("This motor is a slave and should be set through the master motor")
     end
 
-    -- Set the motor's speed as well as all its slaves' speeds, if any
-    if self:getStatus() == "master" then
-        self.motor.setSpeed(set_point)
-        for index, slave_data in ipairs(self.slaves) do
-            if slave_data[2] == true then
-                slave_data[1].motor.setSpeed(-set_point)
-            else
-                slave_data[1].motor.setSpeed(set_point)
+    if ramped then
+
+        local err
+
+        if self:getStatus() == "master" then
+            while self:getSpeed() < (set_point - tolerance) do
+                err = set_point - self:getSpeed()
+                
+                self.motor.setSpeed(self.controller:run(err))
+                for index, slave_data in ipairs(self.slaves) do
+                    if slave_data[2] == true then
+                        slave_data[1].motor.setSpeed(-self.controller:run(err))
+                    else
+                        slave_data[1].motor.setSpeed(self.controller:run(err))
+                    end
+                end   
+
+                os.sleep(0.6)
             end
-        end        
-    elseif self:getStatus() == nil then
-        self.motor.setSpeed(set_point)
+        elseif self:getStatus() == nil then
+            while self:getSpeed() < (set_point - tolerance) do
+                err = set_point - self:getSpeed()
+
+                self.motor.setSpeed(self.controller:run(err))
+                print(self:getSpeed())      
+                
+                os.sleep(0.6)
+            end
+        end
+    else
+        -- Set the motor's speed as well as all its slaves' speeds, if any
+        if self:getStatus() == "master" then
+            self.motor.setSpeed(set_point)
+            for index, slave_data in ipairs(self.slaves) do
+                if slave_data[2] == true then
+                    slave_data[1].motor.setSpeed(-set_point)
+                else
+                    slave_data[1].motor.setSpeed(set_point)
+                end
+            end        
+        elseif self:getStatus() == nil then
+            self.motor.setSpeed(set_point)
+        end
     end
 end
 
@@ -149,7 +181,7 @@ end
 
 --helper function for stopping the motor
 function Motor:stop()
-    Motor:run(0)
+    Motor:run(0,false)
 end
 
 --return the motor class
