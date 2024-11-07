@@ -7,18 +7,10 @@ local test = "https://raw.githubusercontent.com/peytonOsb/FactoryControl/main/te
 local installer = "https://https://raw.githubusercontent.com/peytonOsb/FactoryControl/refs/heads/main/Installer.lua"
 
 --read variables for each of the files we have to recieve
-local FC, MT, PID, MC, T, IN
-local FCFile, MTFile, PIDFile, MCFile, TFile, INFile
+local FC, MT, PID, MC, T
+local FCFile, MTFile, PIDFile, MCFile, TFile
 
 fs.makeDir("lib")
-
---file retrieval for the installer
-IN = http.get(installer)
-INFile = IN.readAll()
-
-local file1 = fs.open("installer", "w")
-file1.write(INFile)
-file1.close()
 
 --file retrieval for factory classes
 FC = http.get(Factory_class)
