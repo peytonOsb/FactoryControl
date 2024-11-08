@@ -36,11 +36,7 @@ function Motor:new(...)
     --create a new pid controller specific to the electric motor instance
     local PIDController = require("lib/PIDController")
 
-    if #args > 3 then
-        local Controller = PIDController:newController(args[4],args[5],args[6],args[2],args[3])
-    else
-        local Controller = PIDController:newController(0.1,0.1,0.1,args[2],args[3])
-    end
+    local Controller = PIDController:newController(0.1,0.1,0.1,args[2],args[3])
 
     --create the metatable for the electric motor's properties
     local self_obj = setmetatable({}, Motor)
