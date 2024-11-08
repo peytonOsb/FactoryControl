@@ -114,7 +114,7 @@ function Motor:run(set_point,ramped)
         local err
 
         if self:getStatus() == "master" then
-            while self:getSpeed() < (set_point - tolerance) do
+            while self:getSpeed() ~= (set_point - tolerance) do
                 err = set_point - self:getSpeed()
                 
                 self.motor.setSpeed(self.controller:run(err))
@@ -129,7 +129,7 @@ function Motor:run(set_point,ramped)
                 os.sleep(0.6)
             end
         elseif self:getStatus() == nil then
-            while self:getSpeed() < (set_point - tolerance) do
+            while self:getSpeed() ~= (set_point - tolerance) do
                 err = set_point - self:getSpeed()
 
                 self.motor.setSpeed(self.controller:run(err))
