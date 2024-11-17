@@ -96,57 +96,62 @@ function Motor:removeSlave(...)
 end
 
 -- Helper function for setting the motor and all slaves' speeds
-function Motor:run(set_point,ramped)
-    local tolerance = 0.2
-    assert(type(set_point) == "number", "The speed a motor needs to be set to should be a number")
+function Motor:run(set_point,ramped, tol)
+    --parameter validation
+    assert(type(set_point) == "number", "speed of motors should be set to a number")
+    assert(type(ramped) == "boolean", "ramped should be true false value")
 
     -- Check if the motor whose speed is being altered is a slave
     if self:getStatus() == "slave" then
         error("This motor is a slave and should be set through the master motor")
     end
 
-    if ramped then
+    --slave retrieval
+    local slaves = self:getSlaves()
 
-        local err
+    --variable declaration
+    local err
+    local TOLERANCE = tol or 0
 
-        if self:getStatus() == "master" then
-            while self:getSpeed() ~= (set_point - tolerance) do
-                err = set_point - self:getSpeed()
-                
-                self.motor.setSpeed(self.controller:run(err))
-                for index, slave_data in ipairs(self.slaves) do
-                    if slave_data[2] == true then
-                        slave_data[1].motor.setSpeed(-self.controller:run(err))
-                    else
-                        slave_data[1].motor.setSpeed(self.controller:run(err))
-                    end
-                end   
+    --speed determination
+    if slaves == nil and not ramped then
+        self.motor.setSpeed(set_point)
+    elseif slaves == nil and ramped then
+        while not self:within(self:getSpeed(), set_point, TOLERANCE) do
+            err = set_point - self:getSpeed()
+            Cspeed = self.controller:run(err)
 
-                os.sleep(0.6)
-            end
-        elseif self:getStatus() == nil then
-            while self:getSpeed() ~= (set_point - tolerance) do
-                err = set_point - self:getSpeed()
+            self.motor.setSpeed(Cspeed)
 
-                self.motor.setSpeed(self.controller:run(err))
-                print(self:getSpeed())      
-                
-                os.sleep(0.6)
+            os.sleep(0.6)
+        end
+    elseif slaves ~= nil and not ramped then
+        self.motor.setSpeed(set_point)
+
+        for index, data in ipairs(slaves) do
+            if slaves[index][2] == false then
+                slaves[index].motor.setSpeed(set_point)
+            else
+                slaves[index].motor.setSpeed(-set_point)
             end
         end
-    else
-        -- Set the motor's speed as well as all its slaves' speeds, if any
-        if self:getStatus() == "master" then
-            self.motor.setSpeed(set_point)
-            for index, slave_data in ipairs(self.slaves) do
-                if slave_data[2] == true then
-                    slave_data[1].motor.setSpeed(-set_point)
+    elseif slaves~= nil and ramped then
+        while not self:within(self:getSpeed(), set_point, TOLERANCE) do
+            err = set_point - self:getSpeed()
+            Cspeed = self.controller:run(err)
+            
+            self.motor.setSpeed(Cspeed)
+
+            for index, data in ipairs(slaves) do
+
+                if slaves[index][2] == false then
+                    slaves[index].motor.setSpeed(Cspeed)
                 else
-                    slave_data[1].motor.setSpeed(set_point)
+                    slaves[index].motor.setSpeed(-Cspeed)
                 end
-            end        
-        elseif self:getStatus() == nil then
-            self.motor.setSpeed(set_point)
+            end    
+            
+            os.sleep(0.6)
         end
     end
 end
@@ -159,6 +164,14 @@ function Motor:getSlaves()
         return nil
     end
 end 
+
+function Motor:within(value, desired, TOL)
+    if  math.abs(value - desired) < TOL then
+        return true
+    else
+        return false
+    end
+end
 
 --helper function for retrieving the motors speed
 function Motor:getSpeed()
