@@ -101,8 +101,6 @@ function Motor:run(set_point,ramped, tol)
     assert(type(set_point) == "number", "speed of motors should be set to a number")
     assert(type(ramped) == "boolean", "ramped should be true false value")
 
-    self.controller:unwind()
-
     -- Check if the motor whose speed is being altered is a slave
     if self:getStatus() == "slave" then
         error("This motor is a slave and should be set through the master motor")
@@ -126,6 +124,7 @@ function Motor:run(set_point,ramped, tol)
             self.motor.setSpeed(Cspeed)
 
             os.sleep(0.6)
+            self.controller:unwind()
         end
     elseif slaves ~= nil and not ramped then
         self.motor.setSpeed(set_point)
@@ -137,7 +136,7 @@ function Motor:run(set_point,ramped, tol)
                 slaves[index].motor.setSpeed(-set_point)
             end
         end
-    elseif slaves~= nil and ramped then
+    elseif slaves ~= nil and ramped then
         while not self:within(self:getSpeed(), set_point, TOLERANCE) do
             err = set_point - self:getSpeed()
             Cspeed = self.controller:run(err)
@@ -148,8 +147,10 @@ function Motor:run(set_point,ramped, tol)
 
                 if slaves[index][2] == false then
                     slaves[index].motor.setSpeed(Cspeed)
+                    slaves[index].controller:unwind()
                 else
                     slaves[index].motor.setSpeed(-Cspeed)
+                    slaves[index].controller:unwind()
                 end
             end    
             
