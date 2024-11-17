@@ -108,6 +108,7 @@ function Motor:run(set_point,ramped, tol)
 
     --slave retrieval
     local slaves = self:getSlaves()
+    self.controller:unwind()
 
     --variable declaration
     local err
@@ -124,7 +125,6 @@ function Motor:run(set_point,ramped, tol)
             self.motor.setSpeed(Cspeed)
 
             os.sleep(0.6)
-            self.controller:unwind()
         end
     elseif slaves ~= nil and not ramped then
         self.motor.setSpeed(set_point)
@@ -147,10 +147,8 @@ function Motor:run(set_point,ramped, tol)
 
                 if slaves[index][2] == false then
                     slaves[index].motor.setSpeed(Cspeed)
-                    slaves[index].controller:unwind()
                 else
                     slaves[index].motor.setSpeed(-Cspeed)
-                    slaves[index].controller:unwind()
                 end
             end    
             
