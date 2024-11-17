@@ -101,6 +101,8 @@ function Motor:run(set_point,ramped, tol)
     assert(type(set_point) == "number", "speed of motors should be set to a number")
     assert(type(ramped) == "boolean", "ramped should be true false value")
 
+    self.controller:unwind()
+
     -- Check if the motor whose speed is being altered is a slave
     if self:getStatus() == "slave" then
         error("This motor is a slave and should be set through the master motor")
