@@ -43,10 +43,9 @@ function PID:run(err)
 
   --output determination and clamping
   local output = error * self.gain + integral * self.compensation + derivative * self.dampening
-  local clamped_output = math.max(self.min, math.min(self.max, output))
 
   --output return for system adjustment
-  return clamped_output
+  return output
 end
 
 function PID:unwind()
