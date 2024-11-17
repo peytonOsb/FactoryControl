@@ -49,6 +49,10 @@ function PID:run(err)
   return clamped_output
 end
 
+function PID:unwind()
+  self.prev_err = 0
+  self.prev_integral = 0
+end
 
 
 return PID
