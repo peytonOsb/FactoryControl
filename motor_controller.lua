@@ -118,7 +118,7 @@ function Motor:run(set_point,ramped, tol)
     if slaves == nil and not ramped then
         self.motor.setSpeed(set_point)
     elseif slaves == nil and ramped then
-        while not self:within(self:getSpeed(), set_point, TOLERANCE) do
+        while not math.abs(self.motor:getSpeed() - set_point) < TOLERANCE do
             err = set_point - self:getSpeed()
             Cspeed = self.controller:run(err)
 
@@ -131,13 +131,13 @@ function Motor:run(set_point,ramped, tol)
 
         for index, data in ipairs(slaves) do
             if slaves[index][2] == false then
-                slaves[index].motor.setSpeed(set_point)
+                slaves[index][1].motor.setSpeed(set_point)
             else
-                slaves[index].motor.setSpeed(-set_point)
+                slaves[index][1].motor.setSpeed(-set_point)
             end
         end
     elseif slaves ~= nil and ramped then
-        while not self:within(self:getSpeed(), set_point, TOLERANCE) do
+        while not math.abs(self.motor:getSpeed() - set_point) < TOLERANCE do
             err = set_point - self:getSpeed()
             Cspeed = self.controller:run(err)
             
