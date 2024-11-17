@@ -123,7 +123,7 @@ function Motor:run(set_point,ramped, tol)
             Cspeed = self.controller:run(err)
 
             self.motor.setSpeed(Cspeed)
-
+            print(Cspeed)
             os.sleep(0.6)
         end
     elseif slaves ~= nil and not ramped then
