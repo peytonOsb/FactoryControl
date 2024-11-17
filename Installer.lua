@@ -1,9 +1,9 @@
 -- git hub file location setting
-local Factory_class = "https://raw.githubusercontent.com/peytonOsb/FactoryControl/refs/heads/featurs/continuous_run/Factory_classes.lua"
-local Module_tester = "https://raw.githubusercontent.com/peytonOsb/FactoryControl/refs/heads/featurs/continuous_run/ModuleTester.lua"
-local PIDController = "https://raw.githubusercontent.com/peytonOsb/FactoryControl/refs/heads/featurs/continuous_run/PIDController.lua"
-local MotorController = "https://raw.githubusercontent.com/peytonOsb/FactoryControl/refs/heads/featurs/continuous_run/motor_controller.lua"
-local test = "https://raw.githubusercontent.com/peytonOsb/FactoryControl/refs/heads/featurs/continuous_run/test.lua"
+local Factory_class = "https://raw.githubusercontent.com/peytonOsb/FactoryControl/refs/heads/main/Factory_classes.lua"
+local Module_tester = "https://raw.githubusercontent.com/peytonOsb/FactoryControl/refs/heads/main/ModuleTester.lua"
+local PIDController = "https://raw.githubusercontent.com/peytonOsb/FactoryControl/refs/heads/main/PIDController.lua"
+local MotorController = "https://raw.githubusercontent.com/peytonOsb/FactoryControl/refs/heads/main/motor_controller.lua"
+local test = "https://raw.githubusercontent.com/peytonOsb/FactoryControl/refs/heads/main/test.lua"
 local installer = "https://https://raw.githubusercontent.com/peytonOsb/FactoryControl/refs/heads/main/Installer.lua"
 
 --read variables for each of the files we have to recieve
