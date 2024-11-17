@@ -146,9 +146,9 @@ function Motor:run(set_point,ramped, tol)
             for index, data in ipairs(slaves) do
 
                 if slaves[index][2] == false then
-                    slaves[index].motor.setSpeed(Cspeed)
+                    slaves[index][1].motor.setSpeed(Cspeed)
                 else
-                    slaves[index].motor.setSpeed(-Cspeed)
+                    slaves[index][1].motor.setSpeed(-Cspeed)
                 end
             end    
             
