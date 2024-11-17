@@ -112,7 +112,7 @@ function Motor:run(set_point,ramped, tol)
 
     --variable declaration
     local err
-    local TOLERANCE = tol or 0
+    local TOLERANCE = tol or 0.2
     local Cspeed = 0
 
     --speed determination
