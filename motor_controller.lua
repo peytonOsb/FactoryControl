@@ -38,12 +38,19 @@ function Motor:new(...)
 
     local Controller = PIDController:newController(0.1,0.1,0.1,args[2],args[3])
 
+    --min max sorting allowing input of min and max in any order
+    if args[3] > args[2] then
+        local max = args[3]
+        args[3] = args[2]
+        args[2] = max
+    end
+        
     --create the metatable for the electric motor's properties
     local self_obj = setmetatable({}, Motor)
     self_obj.motor = motor
     self_obj.id = peripheral_name
-    self_obj.min_speed = args[2]
-    self_obj.max_speed = args[3]
+    self_obj.max_speed = args[2]
+    self_obj.min_speed = args[3]
     self_obj.controller = Controller
     self_obj.status = nil
 
@@ -105,7 +112,7 @@ function Motor:run(set_point,ramped, tol)
     if self:getStatus() == "slave" then
         error("This motor is a slave and should be set through the master motor")
     end
-
+  
     --slave retrieval
     local slaves = self:getSlaves()
     self.controller:unwind()
@@ -114,12 +121,22 @@ function Motor:run(set_point,ramped, tol)
     local err
     local TOLERANCE = tol or 0.2
     local Cspeed = 0
+    local clamped_speed
+  
+      --parameter clamping for speed setting
+    if set_point < self.min_speed then
+        clamped_speed = self.min_speed
+    elseif set_point > self.max_speed then
+       clamped_speed = self.max_speed 
+    else
+        clamped_speed = set_point
+    end
 
     --speed determination
     if slaves == nil and not ramped then
-        self.motor.setSpeed(set_point)
+        self.motor.setSpeed(clamped_speed)
     elseif slaves == nil and ramped then
-        while not (math.abs(Cspeed - set_point) <= TOLERANCE) do
+        while not (math.abs(Cspeed - clamped_speed) <= TOLERANCE) do
             err = set_point - self:getSpeed()
             Cspeed = self.controller:run(err)
 
@@ -128,17 +145,17 @@ function Motor:run(set_point,ramped, tol)
             os.sleep(0.6)
         end
     elseif slaves ~= nil and not ramped then
-        self.motor.setSpeed(set_point)
+        self.motor.setSpeed(clamped_speed)
 
         for index, data in ipairs(slaves) do
             if slaves[index][2] == false then
-                slaves[index][1].motor.setSpeed(set_point)
+                slaves[index][1].motor.setSpeed(clamped_speed)
             else
-                slaves[index][1].motor.setSpeed(-set_point)
+                slaves[index][1].motor.setSpeed(-clamped_speed)
             end
         end
     elseif slaves ~= nil and ramped then
-        while not (math.abs(Cspeed - set_point) <= TOLERANCE) do
+        while not (math.abs(Cspeed - clamped_speed) <= TOLERANCE) do
             err = set_point - self:getSpeed()
             Cspeed = self.controller:run(err)
             
@@ -155,6 +172,7 @@ function Motor:run(set_point,ramped, tol)
             
             os.sleep(0.6)
         end
+
     end
 end
 
