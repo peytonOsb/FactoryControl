@@ -36,11 +36,7 @@ function Motor:new(...)
     --create a new pid controller specific to the electric motor instance
     local PIDController = require("lib/PIDController")
 
-    if #args > 3 then
-        local Controller = PIDController:newController(args[4],args[5],args[6],args[2],args[3])
-    else
-        local Controller = PIDController:newController(0.1,0.1,0.1,args[2],args[3])
-    end
+    local Controller = PIDController:newController(0.1,0.1,0.1,args[2],args[3])
 
     --min max sorting allowing input of min and max in any order
     if args[3] > args[2] then
@@ -107,16 +103,27 @@ function Motor:removeSlave(...)
 end
 
 -- Helper function for setting the motor and all slaves' speeds
-function Motor:run(set_point)
-    local clamped_speed
-    assert(type(set_point) == "number", "The speed a motor needs to be set to should be a number")
+function Motor:run(set_point,ramped, tol)
+    --parameter validation
+    assert(type(set_point) == "number", "speed of motors should be set to a number")
+    assert(type(ramped) == "boolean", "ramped should be true false value")
 
     -- Check if the motor whose speed is being altered is a slave
     if self:getStatus() == "slave" then
         error("This motor is a slave and should be set through the master motor")
     end
+  
+    --slave retrieval
+    local slaves = self:getSlaves()
+    self.controller:unwind()
 
-    --parameter clamping for speed setting
+    --variable declaration
+    local err
+    local TOLERANCE = tol or 0.2
+    local Cspeed = 0
+    local clamped_speed
+  
+      --parameter clamping for speed setting
     if set_point < self.min_speed then
         clamped_speed = self.min_speed
     elseif set_point > self.max_speed then
@@ -125,19 +132,47 @@ function Motor:run(set_point)
         clamped_speed = set_point
     end
 
-    -- Set the motor's speed as well as all its slaves' speeds, if any
-    if self:getStatus() == "master" then
-        --set speed of both the "master" motor and slav motors' speeds
+    --speed determination
+    if slaves == nil and not ramped then
         self.motor.setSpeed(clamped_speed)
-        for index, slave_data in ipairs(self.slaves) do
-            if slave_data[2] == true then
-                slave_data[1].motor.setSpeed(-clamped_speed)
+    elseif slaves == nil and ramped then
+        while not (math.abs(Cspeed - clamped_speed) <= TOLERANCE) do
+            err = set_point - self:getSpeed()
+            Cspeed = self.controller:run(err)
+
+            self.motor.setSpeed(Cspeed)
+            print(Cspeed)
+            os.sleep(0.6)
+        end
+    elseif slaves ~= nil and not ramped then
+        self.motor.setSpeed(clamped_speed)
+
+        for index, data in ipairs(slaves) do
+            if slaves[index][2] == false then
+                slaves[index][1].motor.setSpeed(clamped_speed)
             else
-                slave_data[1].motor.setSpeed(clamped_speed)
+                slaves[index][1].motor.setSpeed(-clamped_speed)
             end
-        end        
-    elseif self:getStatus() == nil then
-        self.motor.setSpeed(clamped_speed)
+        end
+    elseif slaves ~= nil and ramped then
+        while not (math.abs(Cspeed - clamped_speed) <= TOLERANCE) do
+            err = set_point - self:getSpeed()
+            Cspeed = self.controller:run(err)
+            
+            self.motor.setSpeed(Cspeed)
+
+            for index, data in ipairs(slaves) do
+
+                if slaves[index][2] == false then
+                    slaves[index][1].motor.setSpeed(Cspeed)
+                else
+                    slaves[index][1].motor.setSpeed(-Cspeed)
+                end
+            end    
+            
+            os.sleep(0.6)
+        end
+
     end
 end
 
@@ -149,6 +184,14 @@ function Motor:getSlaves()
         return nil
     end
 end 
+
+function Motor:within(value, desired, TOL)
+    if  math.abs(value - desired) < TOL then
+        return true
+    else
+        return false
+    end
+end
 
 --helper function for retrieving the motors speed
 function Motor:getSpeed()
@@ -167,7 +210,7 @@ end
 
 --helper function for stopping the motor
 function Motor:stop()
-    Motor:run(0)
+    Motor:run(0,false)
 end
 
 --return the motor class
