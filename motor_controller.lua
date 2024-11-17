@@ -113,12 +113,13 @@ function Motor:run(set_point,ramped, tol)
     --variable declaration
     local err
     local TOLERANCE = tol or 0
+    local Cspeed = 0
 
     --speed determination
     if slaves == nil and not ramped then
         self.motor.setSpeed(set_point)
     elseif slaves == nil and ramped then
-        while not (math.abs(self.motor:getSpeed() - set_point) < TOLERANCE) do
+        while not (math.abs(Cspeed - set_point) < TOLERANCE) do
             err = set_point - self:getSpeed()
             Cspeed = self.controller:run(err)
 
@@ -137,7 +138,7 @@ function Motor:run(set_point,ramped, tol)
             end
         end
     elseif slaves ~= nil and ramped then
-        while not (math.abs(self.motor:getSpeed() - set_point) < TOLERANCE) do
+        while not (math.abs(Cspeed - set_point) < TOLERANCE) do
             err = set_point - self:getSpeed()
             Cspeed = self.controller:run(err)
             
