@@ -57,7 +57,7 @@ function Module:setCrushRate(number, TOL)
     table = BST:lookupTableToBST(table)
 
     local Val = table:search(number,TOL).value
-    local Quantity, RPM = Val[1], Val[2]
+    local Quantity, RPM = Val[2], Val[3]
 
     self.belt:run(RPM)
     self.crush:run(RPM)
