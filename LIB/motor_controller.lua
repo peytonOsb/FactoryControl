@@ -34,7 +34,7 @@ function Motor:new(...)
     end
 
     --create a new pid controller specific to the electric motor instance
-    local PIDController = require("lib/PIDController")
+    local PIDController = require("LIB/PIDController")
 
     local Controller = PIDController:newController(0.1,0.1,0.1,args[2],args[3])
 
