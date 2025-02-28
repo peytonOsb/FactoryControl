@@ -1,41 +1,43 @@
 Module = {}
 Module.__index = Module
 
--- args[1] == size, args[2] == Input type, args[3] == motors
-function Module:Module(...)
-    -- args[1] == size, args[2] == Input type, args[3] == motors
+-- args[1] == size, args[2] == Input type, args[3] == motors, args[4] == vaults
+function Module:ProductionModule(...)
     -- motors = {belt, crush, slave}
     local args = {...}
     local vaults = {} 
 
     --Parameter assertion
     assert(type(args[1]) == "number","size must be of type number")
-    assert(type(args[2]) == "string","Product must be of type string")
+    assert(type(args[2]) == "string","input must be of type string")
     assert(type(args[3]) == "table","motor must be in a table as defined")
-    assert(type(args[4]) == "table", "vault ids must be in form table [leftmost id, ..., rightmost id]")
+    
     
     -- Ensure exactly three motors are provided
     assert(#args[3] == 3, "Expected 3 motors in the table")
-
-    --storage verification
-    for i in #args[4] do
-        local String = string.format("create:item_vault_%d",args[4][i])
-        vaults[i] = peripheral.wrap(String)
-    end
 
     -- Motor verification
     for i, motor in ipairs(args[3]) do
         assert(type(motor) == "string", "Motor at index " .. i .. " is not a valid table: " .. tostring(motor))
     end
 
+    --Storage Verification
+    if args[4] ~= nil then
+        for i = 1, #args[4] do 
+            local vaultString = string.format("create:item_vault_%d", tonumber(args[4][i]))
+            local peripheral = peripheral.wrap(vaultString)
+            table.insert(vaults, peripheral)
+        end
+    end
+
     -- Library Verification
-    local success, motor_controller = pcall(require, "motor_controller")
+    local success, motor_controller = pcall(require, "LIB/motor_controller")
     if not success then error("Could not find motor_controller library") end
 
-    local success, BST = pcall(require, "BST")
+    local success, BST = pcall(require, "LIB/BST")
     if not success then error("Could not find Binary Search Tree library") end
 
-    local success, PIDController = pcall(require, "PIDController")
+    local success, PIDController = pcall(require, "LIB/PIDController")
     if not success then error("Could not find PIDController library") end
 
 
@@ -52,17 +54,13 @@ function Module:Module(...)
     return self_obj
 end
 
-function Module:getStorage(number)
-    return self.vaults[number]
-end
-
 function Module:setCrushRate(number, TOL)
     --parameter assertion
     assert(type(number) == "number", "output rate must be a number")
 
     --external file validation
-    local BST = require("BST")
-    local lookup = require(string.format("LookupTables.%s",self.input))
+    local BST = require("LIB/BST")
+    local lookup = require(string.format("Modules/LookupTables.%s",self.input))
 
     local index = math.floor(number)
     local table = lookup[index]
@@ -76,6 +74,15 @@ function Module:setCrushRate(number, TOL)
     self.crush:run(RPM, true, 0)
 end
 
+function Module:getOutput(quantity, rpm)
+    local denominator = math.max(0.25, math.min((25 * math.log(quantity, 2)) / (2 * rpm), 20))
+    return ((quantity / (230 / denominator)) + 1) * 20
+end
+
+function Module:getMaxOutput()
+    return self:getOutput(64, 256) * self.size
+end
+
 function Module:getElectricityUsage()
     local belt_speed = self.belt:getSpeed()
     local crusher_speed = self.crush:getSpeed()
@@ -87,9 +94,18 @@ function Module:setCrushingSpeed(Speed)
     self.crush:run(Speed)
 end
 
+function Module:getSize()
+    return self.size
+end
+
+
 function Module:setInputSpeed(Speed)
     assert(type(Speed) == "number" and Speed >= 0, "Belt speed must be a non-negative number")
     self.belt:run(Speed)
+end
+
+function Module:getStorage()
+    return self.vaults
 end
 
 return Module
