@@ -6,14 +6,22 @@ function Module:Module(...)
     -- args[1] == size, args[2] == Input type, args[3] == motors
     -- motors = {belt, crush, slave}
     local args = {...}
+    local vaults = {} 
 
     --Parameter assertion
     assert(type(args[1]) == "number","size must be of type number")
     assert(type(args[2]) == "string","Product must be of type string")
     assert(type(args[3]) == "table","motor must be in a table as defined")
+    assert(type(args[4]) == "table", "vault ids must be in form table [leftmost id, ..., rightmost id]")
     
     -- Ensure exactly three motors are provided
     assert(#args[3] == 3, "Expected 3 motors in the table")
+
+    --storage verification
+    for i in #args[4] do
+        local String = string.format("create:item_vault_%d",args[4][i])
+        vaults[i] = peripheral.wrap(String)
+    end
 
     -- Motor verification
     for i, motor in ipairs(args[3]) do
@@ -38,9 +46,14 @@ function Module:Module(...)
     self_obj.belt = motor_controller:new(args[3][1], 256, 0, 0.1, 0.1, 0.1)
     self_obj.crush = motor_controller:new(args[3][2], 256, 0, 0.1, 0.1, 0.1)
     self_obj.slave = motor_controller:new(args[3][3], 256, 0, 0.1, 0.1, 0.1)
+    self_obj.vaults = vaults
 
     self_obj.crush:setSlave(self_obj.slave, true)
     return self_obj
+end
+
+function Module:getStorage(number)
+    return self.vaults[number]
 end
 
 function Module:setCrushRate(number, TOL)
@@ -59,8 +72,8 @@ function Module:setCrushRate(number, TOL)
     local Val = table:search(number,TOL).value
     local Quantity, RPM = Val[2], Val[3]
 
-    self.belt:run(RPM)
-    self.crush:run(RPM)
+    self.belt:run(RPM, true, 0)
+    self.crush:run(RPM, true, 0)
 end
 
 function Module:getElectricityUsage()
