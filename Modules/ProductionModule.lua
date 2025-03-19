@@ -8,7 +8,6 @@ function Module:ProductionModule(...)
     local vaults = {} 
 
     --Parameter assertion
-    assert(type(args[1]) == "number","size must be of type number")
     assert(type(args[2]) == "table","motor must be in a table as defined")
     
     
@@ -23,7 +22,7 @@ function Module:ProductionModule(...)
     --Storage Verification
     if args[3] ~= nil then
         for i = 1, #args[3] do 
-            local vaultString = string.format("create:item_vault_%d", tonumber(args[4][i]))
+            local vaultString = string.format("create:item_vault_%d", tonumber(args[3][i]))
             local peripheral = peripheral.wrap(vaultString)
             table.insert(vaults, peripheral)
         end
@@ -69,13 +68,17 @@ function Module:setCrushRate(number, input, TOL)
     local success, Rates = pcall(require, "Modules.LookupTables.RateTable") -- find rate lookup table 
     if not success then error("could not find lookup table for rates") else print("found Rate lookup table") end
 
-    local Rate = Rates[self.input][1] --find the Recipe's processing rate in Rates Table
+    local Rate = string.format("Modules.LookupTables.%d", Rates[input][1]) --find the Recipe's processing rate in Rates Table
 
-    local success, tab = pcall(require, string.format("Module.LookupTables.%d", Rate)) -- find the specific lookup table
+    local success, tab = pcall(require, Rate) -- find the specific lookup table
     if not success then error(string.format("could not find Rate table for this item: %s",input)) else print("found the necessary lookup table") end
 
-    tab = BST:lookupTableToBST(tab[math.floor(input)])
-    local RPM = tab:search(number, TOL)[3]
+    tab = BST:lookupTableToBST(tab[math.floor(number)])
+    print("converted lookup table to binary search tree" )
+
+    local RPM = tab:search(number, TOL).value[3]
+    print("found necessary RPM: ", RPM )
+
 
     self.belt:run(RPM, true, 0)
     self.crush:run(RPM, true, 0)
