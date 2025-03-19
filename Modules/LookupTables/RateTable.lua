@@ -1,4 +1,4 @@
-resources = {
+local resources = {
     ["clay block"] = {50, nil},
     ["bone meal"] = {70, nil},
     ["wool"] = {100, nil},
@@ -16,10 +16,10 @@ resources = {
     ["tuff"] = {350, nil},
 
     ["sea pickle"] = {50, nil},
-    ["beetroot"] = {70, nil},
+    ["beetroot"] = {70, redDye = 2, beetrootSeeds = 0.1},
     ["ink sack"] = {100, nil},
     ["prismarine crystal"] = {150, nil},
-    ["andesite"] = {200, nil},
+    ["andesite"] = {200, cobblestone = 1},
     ["cobblestone"] = {250, nil},
     ["diamond ore"] = {350, nil},
 
@@ -31,9 +31,9 @@ resources = {
     ["emerald ore"] = {250, nil},
     ["deepslate copper ore"] = {350, nil},
 
-    ["azure bluet"] = {50, nil},
+    ["azure bluet"] = {50, lightGrayDye = 2, whiteDye = 0.2},
     ["coal"] = {70, nil},
-    ["amethyst cluster"] = {100, nil},
+    ["amethyst cluster"] = {100, amethystShard = 7.5},
     ["any horse armor"] = {150, nil},
     ["copper ore"] = {200, nil},
     ["zinc ore"] = {250, nil},
@@ -47,7 +47,7 @@ resources = {
 
     ["fern"] = {50, nil},
     ["lilac"] = {70, nil},
-    ["amethyst block"] = {100, nil},
+    ["amethyst block"] = {100, amethystShard = 3.5},
     ["gold ore"] = {150, nil},
     ["deepslate gold ore"] = {200, nil},
 
@@ -65,7 +65,7 @@ resources = {
     ["lapis ore"] = {100, nil},
     
     ["rose bush"] = {50, nil},
-    ["blaze rod"] = {70, nil},
+    ["blaze rod"] = {70, blazePowder = 3.75},
     ["netherrack"] = {100, nil},
     ["nether gold ore"] = {250, nil},
 
@@ -87,3 +87,5 @@ resources = {
     ["deepslate emerald ore"] = {450, nil},
     ["obsidian"] = {500, nil}
 }
+
+return resources

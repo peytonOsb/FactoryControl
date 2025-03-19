@@ -1,7 +1,7 @@
 Module = {}
 Module.__index = Module
 
--- args[1] == size, args[2] == Input type, args[3] == motors, args[4] == vaults
+-- args[1] == size, args[2] == motors, args[3] == vaults
 function Module:ProductionModule(...)
     -- motors = {belt, crush, slave}
     local args = {...}
@@ -9,21 +9,20 @@ function Module:ProductionModule(...)
 
     --Parameter assertion
     assert(type(args[1]) == "number","size must be of type number")
-    assert(type(args[2]) == "string","input must be of type string")
-    assert(type(args[3]) == "table","motor must be in a table as defined")
+    assert(type(args[2]) == "table","motor must be in a table as defined")
     
     
     -- Ensure exactly three motors are provided
-    assert(#args[3] == 3, "Expected 3 motors in the table")
+    assert(#args[2] == 3, "Expected 3 motors in the table")
 
     -- Motor verification
-    for i, motor in ipairs(args[3]) do
+    for i, motor in ipairs(args[2]) do
         assert(type(motor) == "string", "Motor at index " .. i .. " is not a valid table: " .. tostring(motor))
     end
 
     --Storage Verification
-    if args[4] ~= nil then
-        for i = 1, #args[4] do 
+    if args[3] ~= nil then
+        for i = 1, #args[3] do 
             local vaultString = string.format("create:item_vault_%d", tonumber(args[4][i]))
             local peripheral = peripheral.wrap(vaultString)
             table.insert(vaults, peripheral)
@@ -34,41 +33,49 @@ function Module:ProductionModule(...)
     local success, motor_controller = pcall(require, "LIB/motor_controller")
     if not success then error("Could not find motor_controller library") end
 
-    local success, BST = pcall(require, "LIB/BST")
+    local success, _ = pcall(require, "LIB/BST")
     if not success then error("Could not find Binary Search Tree library") end
 
-    local success, PIDController = pcall(require, "LIB/PIDController")
+    local success, _ = pcall(require, "LIB/PIDController")
     if not success then error("Could not find PIDController library") end
+
+    local success, _ = pcall(require, "Modules.LookupTables.RateTable") 
+    if not success then error("require rate table for crushers") end
 
 
     --object data setting
     local self_obj = setmetatable({}, Module)
     self_obj.size = args[1]
-    self_obj.input = args[2]
-    self_obj.belt = motor_controller:new(args[3][1], 256, 0, 0.1, 0.1, 0.1)
-    self_obj.crush = motor_controller:new(args[3][2], 256, 0, 0.1, 0.1, 0.1)
-    self_obj.slave = motor_controller:new(args[3][3], 256, 0, 0.1, 0.1, 0.1)
+    self_obj.belt = motor_controller:new(args[2][1], 256, 0, 0.1, 0.1, 0.1)
+    self_obj.crush = motor_controller:new(args[2][2], 256, 0, 0.1, 0.1, 0.1)
+    self_obj.slave = motor_controller:new(args[2][3], 256, 0, 0.1, 0.1, 0.1)
     self_obj.vaults = vaults
 
     self_obj.crush:setSlave(self_obj.slave, true)
     return self_obj
 end
 
-function Module:setCrushRate(number, TOL)
+function Module:setCrushRate(number, input, TOL)
     --parameter assertion
     assert(type(number) == "number", "output rate must be a number")
+    assert(type(input) == "string", "input type must be a string") 
+
+    
 
     --external file validation
-    local BST = require("LIB/BST")
-    local lookup = require(string.format("Modules/LookupTables.%s",self.input))
+    local success, BST = pcall(require, "LIB/BST") -- find binary search tree library
+    if not success then error("could not find Binary tree library") else print("found binary lookup tree library") end
 
-    local index = math.floor(number)
-    local table = lookup[index]
+    local success, Rates = pcall(require, "Modules.LookupTables.RateTable") -- find rate lookup table 
+    if not success then error("could not find lookup table for rates") else print("found Rate lookup table") end
 
-    table = BST:lookupTableToBST(table)
+    local Rate = Rates[self.input][1] --find the Recipe's processing rate in Rates Table
 
-    local Val = table:search(number,TOL).value
-    local Quantity, RPM = Val[2], Val[3]
+    local success, tab = pcall(require, string.format("Module.LookupTables.%d", Rate)) -- find the specific lookup table
+    if not success then error(string.format("could not find Rate table for this item: %s",input)) else print("found the necessary lookup table") end
+
+    tab = BST:lookupTableToBST(tab[math.floor(input)])
+    local RPM = tab:search(number, TOL)[3]
 
     self.belt:run(RPM, true, 0)
     self.crush:run(RPM, true, 0)
