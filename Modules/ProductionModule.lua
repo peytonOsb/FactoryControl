@@ -73,10 +73,10 @@ function Module:setCrushRate(number, input, TOL)
     local success, tab = pcall(require, Rate) -- find the specific lookup table
     if not success then error(string.format("could not find Rate table for this item: %s",input)) else print("found the necessary lookup table") end
 
-    tab = BST:lookupTableToBST(tab[math.floor(number)])
+    tab = BST:lookupTableToBST(tab[math.floor(number / self.size)])
     print("converted lookup table to binary search tree" )
 
-    local RPM = tab:search(number, TOL).value[3]
+    local RPM = tab:search(number/self.size, TOL).value[3]
     print("found necessary RPM: ", RPM )
 
 
