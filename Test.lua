@@ -1,4 +1,4 @@
-local m = require("Modules.ProductionModule")
+--[[local m = require("Modules.ProductionModule")
 local M = require("Modules.Manager")
 
 Mod1 = {{"11", "12", "13"},{"12", "13"}}
@@ -17,3 +17,18 @@ Mods = {m:ProductionModule(US, Mod1[1], Mod1[2]),
 local manager = M:CreateManager(Mods, {"40"})
 
 manager:distribute(5, "cobblestone", 0.1)
+]]--
+
+local function send(id)
+        local message  = textutils.serialize({["sender"] = "s", ["message"] = "Hello world"})
+        print(type(message))
+        rednet.send(id, message)
+end
+
+local function Listen()
+        local _, message = rednet.recieve(nil, 1)
+        local message = textutils.unserialiseJSON(message)
+        print(message["message"])
+end
+
+send(4)
