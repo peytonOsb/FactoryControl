@@ -1,0 +1,23 @@
+
+function supervisor:compileProcesses()
+    local workerProcesses = {}
+
+    for _, worker in ipairs(self.workers.validators) do
+        table.insert(workerProcesses, 
+            function() worker:main(self.watchdog.routingQueue, self.watchdog.invalidMsgs)
+        end)
+    end
+
+    print("worker processes compiled")
+    return workerProcesses
+end
+
+function supervisor:main()
+    supervisor:buildWorkers()
+
+    local processes = supervisor:compileProcesses()
+
+    print("validating Queue")
+    parallel.waitForAll(table.unpack(processes))
+    print("queue Validated")
+end
